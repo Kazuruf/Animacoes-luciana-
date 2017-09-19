@@ -1,0 +1,302 @@
+//Global.
+window.pageRows = []
+window.textureImagesPath;
+
+var Detector = {
+	canvas: !! window.CanvasRenderingContext2D,
+	webgl: ( function () {
+
+		try {
+
+			var canvas = document.createElement( 'canvas' ); return !! ( window.WebGLRenderingContext && ( canvas.getContext( 'webgl' ) || canvas.getContext( 'experimental-webgl' ) ) );
+
+		} catch ( e ) {
+
+			return false;
+
+		}
+
+	} )(),
+
+	workers: !! window.Worker,
+	fileapi: window.File && window.FileReader && window.FileList && window.Blob,
+	getWebGLErrorMessage: function () {
+		var element = document.createElement( 'div' );
+		element.id = 'webgl-error-message';
+		element.style.fontFamily = 'monospace';
+		element.style.fontSize = '13px';
+		element.style.fontWeight = 'normal';
+		element.style.textAlign = 'center';
+		element.style.background = '#fff';
+		element.style.color = '#000';
+		element.style.padding = '1.5em';
+		element.style.width = '400px';
+		element.style.margin = '5em auto 0';
+
+		if ( ! this.webgl ) {
+
+			element.innerHTML = window.WebGLRenderingContext ? [
+				'Your graphics card does not seem to support <a href="http://khronos.org/webgl/wiki/Getting_a_WebGL_Implementation" style="color:#000">WebGL</a>.<br />',
+				'Find out how to get it <a href="http://get.webgl.org/" style="color:#000">here</a>.'
+			].join( '\n' ) : [
+				'Your browser does not seem to support <a href="http://khronos.org/webgl/wiki/Getting_a_WebGL_Implementation" style="color:#000">WebGL</a>.<br/>',
+				'Find out how to get it <a href="http://get.webgl.org/" style="color:#000">here</a>.'
+			].join( '\n' );
+
+		}
+
+		return element;
+
+	},
+
+	addGetWebGLMessage: function ( parameters ) {
+
+		var parent, id, element;
+
+		parameters = parameters || {};
+
+		parent = parameters.parent !== undefined ? parameters.parent : document.body;
+		id = parameters.id !== undefined ? parameters.id : 'oldie';
+
+		element = Detector.getWebGLErrorMessage();
+		element.id = id;
+
+		parent.appendChild( element );
+	}
+};
+
+window.onload = function () {
+    if(Detector.webgl){
+        console.log("Browser support WebGL :)");
+    }else{
+        console.error("Browser not support WebGL :(");
+    }
+    
+    //register texture path.
+    window.textureImagesPath = requireConfigs.texture_images_path;
+    window.meshObjPath = requireConfigs.mesh_obj;
+
+    requirejs.config({
+        baseUrl: requireConfigs.baseUrl,
+
+        paths: {
+            'THREE': 'vendor/three.min',
+            'main': 'modules/main',
+            'Projector': 'modules/common/Projector',
+            'CanvalRender': 'modules/common/CanvasRenderer',
+            'bird': 'modules/birds/Bird',
+            'birdsBoid': 'modules/birds/Boid',
+            'tween': 'modules/common/tween.min',
+            'Detector': 'modules/common/Detector',
+            'OrbitControls': 'modules/common/OrbitControls',
+
+            'BinaryLoader': 'modules/common/BinaryLoader',
+            'ConvolutionShader': 'modules/common/ConvolutionShader',
+            'CopyShader': 'modules/common/CopyShader',
+            'FilmShader': 'modules/common/FilmShader',
+            'FocusShader': 'modules/common/FocusShader',
+            'EffectComposer': 'modules/common/EffectComposer',
+            'MaskPass': 'modules/common/MaskPass',
+            'RenderPass': 'modules/common/RenderPass',
+            'BloomPass': 'modules/common/BloomPass',
+            'ShaderPass': 'modules/common/ShaderPass',
+            'FilmPass': 'modules/common/FilmPass',
+
+            'particles': 'modules/particles/index',
+            'birds': 'modules/birds/index',
+            'interactive_cubes': 'modules/interactive_cubes/index',
+            'interative_cubes_tween': 'modules/interative_cubes_tween/index',
+            'lines': 'modules/lines/index',
+            'particles_sprites': 'modules/particles_sprites/index',
+            'particles_random': 'modules/particles_random/index',
+            'particles_waves': 'modules/particles_waves/index',
+            'lines_sphere': 'modules/lines_sphere/index',
+            'buffergeometry_pointes': 'modules/buffergeometry_pointes/index',
+            'buffergeometry_drawcalls': 'modules/buffergeometry_drawcalls/index',
+            'points_sprites': 'modules/points_sprites/index',
+            'points_dynamic': 'modules/points_dynamic/index'
+        },
+        shim: {
+            'Projector': {
+                deps: ['THREE']
+            },
+            'CanvalRender': {
+                deps: ['THREE']
+            },
+            'bird': {
+                deps: ['THREE']
+            },
+            'boid': {
+                deps: ['THREE']
+            },
+            'particles': {
+                deps: ['THREE']
+            },
+            'birds': {
+                deps: ['THREE', 'Projector', 'CanvalRender', 'bird', 'birdsBoid']
+            },
+            'interactive_cubes': {
+                deps: ['THREE']
+            },
+            'tween': {
+                deps: ['THREE']
+            },
+            'OrbitControls': {
+                deps: ['THREE']
+            },
+            'BinaryLoader': {
+                deps: ['THREE']
+            },
+            'ConvolutionShader': {
+                deps: ['THREE']
+            },
+            'FilmShader': {
+                deps: ['THREE']
+            },
+            'FocusShader': {
+                deps: ['THREE']
+            },
+            'EffectComposer': {
+                deps: ['THREE']
+            },
+            'MaskPass': {
+                deps: ['THREE', 'EffectComposer']
+            },
+            'RenderPass': {
+                deps: ['THREE', 'EffectComposer', 'MaskPass']
+            },
+            'BloomPass': {
+                deps: ['THREE', 'EffectComposer', 'MaskPass', 'RenderPass']
+            },
+            'ShaderPass': {
+                deps: ['THREE', 'EffectComposer', 'MaskPass', 'RenderPass', 'BloomPass']
+            },
+            'FilmPass': {
+                deps: ['THREE', 'EffectComposer', 'EffectComposer', 'MaskPass', 'RenderPass', 'BloomPass']
+            },
+            'particles_sprites': {
+                deps: ['THREE', 'Projector', 'CanvalRender', 'tween']
+            },
+            'interactive_cubes': {
+                deps: ['THREE', 'Projector', 'CanvalRender']
+            },
+            'interative_cubes_tween': {
+                deps: ['THREE', 'Projector', 'CanvalRender', 'tween']
+            },
+            'lines': {
+                deps: ['THREE', 'Projector', 'CanvalRender']
+            },
+            'particles_random': {
+                deps: ['THREE', 'Projector', 'CanvalRender']
+            },
+            'particles_waves': {
+                deps: ['THREE', 'Projector', 'CanvalRender']
+            },
+            'lines_sphere': {
+                deps: ['THREE', 'Projector', 'CanvalRender']
+            },
+            'buffergeometry_pointes': {
+                deps: ['THREE', 'Projector', 'CanvalRender', 'Detector']
+            },
+            'buffergeometry_drawcalls': {
+                deps: ['THREE', 'Projector', 'CanvalRender', 'OrbitControls']
+            },
+            'points_sprites': {
+                deps: ['THREE', 'Projector', 'CanvalRender', 'Detector']
+            },
+            'points_dynamic': {
+                deps: ['THREE', 'Detector',
+                'BinaryLoader', 'ConvolutionShader', 'CopyShader', 'FilmShader',
+                'FocusShader', 'EffectComposer', 'MaskPass', 'RenderPass', 
+                'BloomPass', 'ShaderPass', 'FilmPass']
+            }
+        }
+    });
+
+    if (typeof jQuery === 'function') {
+        define('jquery', function () { return jQuery; });
+    }
+
+    define('entrypoint', ['jquery'], function(jquery){
+        var rowList = document.getElementsByClassName('wgb-customized-row');
+        var rows = [];
+        var updateGlobalPageRows = function(bgEffectType, canvasId){
+            if(!window.pageRows[bgEffectType]){
+                var canvasIds = new Array();
+                window.pageRows[bgEffectType] = canvasIds;
+            }
+
+            window.pageRows[bgEffectType].push(elementId); 
+        }
+
+        for (var i = 0; i < rowList.length; i++) {
+            var elementId = rowList[i].id;
+            var oneElement = document.getElementById(elementId);
+            var bgEffectType = jquery(oneElement).attr('data-bgEffectType');
+
+            switch(bgEffectType){
+                case "particles": {
+                    updateGlobalPageRows("particles", elementId);    
+                    break;
+                }
+                case "geometry_birds": {
+                    updateGlobalPageRows("birds", elementId);  
+                    break;
+                }
+                case "interactive_cubes": {
+                    updateGlobalPageRows("interactive_cubes", elementId);  
+                    break;
+                }
+                case "interative_cubes_tween": {
+                    updateGlobalPageRows("interative_cubes_tween", elementId); 
+                    break;
+                }
+                case "lines": {
+                    updateGlobalPageRows("lines", elementId); 
+                    break;
+                }
+                case "particles_sprites": {
+                    updateGlobalPageRows("particles_sprites", elementId); 
+                    break;
+                }
+                case "particles_random": {
+                    updateGlobalPageRows("particles_random", elementId); 
+                    break;
+                }
+                case "particles_waves": {
+                    updateGlobalPageRows("particles_waves", elementId); 
+                    break;
+                }
+                case "lines_sphere": {
+                    updateGlobalPageRows("lines_sphere", elementId); 
+                    break;
+                }
+                case "buffergeometry_pointes": {
+                    updateGlobalPageRows("buffergeometry_pointes", elementId); 
+                    break; 
+                }
+                case "buffergeometry_drawcalls": {
+                    updateGlobalPageRows("buffergeometry_drawcalls", elementId); 
+                    break;   
+                }
+                case 'points_sprites': {
+                    updateGlobalPageRows("points_sprites", elementId); 
+                    break;  
+                }
+                case 'points_dynamic': {
+                    updateGlobalPageRows("points_dynamic", elementId); 
+                    break; 
+                }
+                default: {
+                }
+            }
+        }
+
+        for(var key in window.pageRows){
+            if (key === 'length' || !window.pageRows.hasOwnProperty(key)) continue;
+            require([key]);
+        }
+    });
+
+    require(['entrypoint']);
+}

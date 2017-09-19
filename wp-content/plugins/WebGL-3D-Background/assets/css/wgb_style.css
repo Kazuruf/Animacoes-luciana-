@@ -1,0 +1,16 @@
+/**
+ * The plugin CSS
+ * @since 1.0
+ */
+
+.vc_row{
+  position:relative;
+}
+.wgb-customized-row{
+  min-height:300px;
+  position: absolute;
+  top:0;
+  left:0;
+  width:100%;
+
+}
